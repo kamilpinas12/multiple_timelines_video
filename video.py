@@ -12,20 +12,10 @@ class Video:
         #time_lines słownik (ilość klaten na sekunde w tył(dodatnie), klawisz włączający lub wyłączający ten przebieg(str))
         self.time_lines = time_lines
 
-        #set default brightness
-        self.brightness = [1/len(time_lines)] * len(time_lines)
-
         self.quit_button = quit_button
 
-        self.state = [1] * len(time_lines)
-
-
-
-    def set_brightness(self, brightness: List[float]):
-        if sum(brightness) <= 1 and len(brightness) == len(self.brightness):
-            self.brightness = brightness
-        else:
-            raise ValueError
+        #wyłączenie wszystkich timelineów
+        self.state = [0] * len(time_lines)
 
 
 
@@ -37,7 +27,6 @@ class Video:
         vid = cv2.VideoCapture(0)
 
         film_size = max(self.time_lines, key=lambda x: x[0])[0]
-        print(f"")
 
         film = []
         self.default_frame = np.zeros(frame_shape + (3, ))
@@ -83,10 +72,16 @@ class Video:
                 self.state[i] = 0
             elif keyboard.is_pressed(key):
                 self.state[i] = 1
-            
-            if self.state[i]:
-                out_frame = np.add(out_frame, np.multiply(film[-t] , self.brightness[i]))    
 
+        if sum(self.state) == 0:
+            return out_frame    
+        
+        n = 1/sum(self.state)
+
+        for i, (t, _) in enumerate(self.time_lines):
+            if self.state[i]:
+                out_frame = np.add(out_frame, np.multiply(film[-t] , n))    
+            
 
         return np.array(out_frame, dtype=np.uint8)
     
