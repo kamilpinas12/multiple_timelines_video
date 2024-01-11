@@ -34,6 +34,9 @@ class Video:
 
 
         while True:
+            if keyboard.is_pressed(self.quit_button):
+                    break
+            
             if (time() - lst_time) > delay:
                 lst_time = time()
 
@@ -47,17 +50,8 @@ class Video:
             
 
                 cv2.imshow(title, self.get_out_frame(film))
-
-
-                if keyboard.is_pressed(self.quit_button):
-                    break
-                
+    
                 cv2.waitKey(1)
-
-            else:
-                if keyboard.is_pressed(self.quit_button):
-                    break
-
 
         vid.release()        
         cv2.destroyAllWindows()  
